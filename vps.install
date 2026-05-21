@@ -1,24 +1,24 @@
 #!/usr/bin/env bash
 # ==========================================================
-# DEUP GAMING SYSTEM fan of 804 | BANE-ANMESH 3S UPLINK
+# DEUP GAMING SYSTEM | BANE-ANMESH 3S UPLINK
 # DATE: 2026-04-08 | UI-TYPE: SEMA-HYPER-VISUAL → VIP ELITE
 # ==========================================================
 set -euo pipefail
 
 # --- VIP ELITE THEME ---
-R='\033[1;38;5;196m'     # Crimson Red
-G='\033[1;38;5;82m'      # Emerald Green
-Y='\033[1;38;5;220m'     # Gold
-C='\033[1;38;5;51m'      # Cyan
-P='\033[1;38;5;201m'     # Hot Pink (VIP)
+R='\033[1;38;5;196m'      # Crimson Red
+G='\033[1;38;5;82m'       # Emerald Green
+Y='\033[1;38;5;220m'      # Gold
+C='\033[1;38;5;51m'       # Cyan
+P='\033[1;38;5;201m'      # Hot Pink (VIP)
 VIOLET='\033[1;38;5;135m' # Deep Violet
-NEON='\033[1;38;5;198m'  # Neon Pink
-W='\033[1;38;5;255m'     # Pure White
-DG='\033[0;38;5;244m'    # Steel Gray
-NC='\033[0m'             # Reset
+NEON='\033[1;38;5;198m'   # Neon Pink
+W='\033[1;38;5;255m'      # Pure White
+DG='\033[0;38;5;244m'     # Steel Gray
+NC='\033[0m'              # Reset
 
-# --- CONFIG ---
-HOST="run.nobitahost.in"
+# --- DEUPGAMING CONFIG ---
+HOST="run.deupgaming.in"
 URL="https://${HOST}"
 NETRC="${HOME}/.netrc"
 IP="65.0.86.121"
@@ -35,7 +35,7 @@ render_vip_header() {
 ██║  ██║██╔══╝  ██║   ██║██╔═══╝ ██║   ██║██╔══██║██║╚██╔╝██║██║██║╚██╗██║██║   ██║
 ██████╔╝███████╗╚██████╔╝██║     ╚██████╔╝██║  ██║██║ ╚═╝ ██║██║██║ ╚████║╚██████╔╝
 ╚═════╝ ╚══════╝ ╚═════╝ ╚═╝      ╚═════╝ ╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝ ╚═════╝ 
-      👑 DEUPGAMING  ROYAL CONTROL 👑
+     👑 DEUPGAMING  ROYAL CONTROL 👑
 EOF
     echo -e "${NC}"
 
@@ -44,7 +44,7 @@ EOF
     echo -e "${VIOLET}║${NC}               ${DG}v14.0${NC} ${W}|${NC} ${G}SECURE HYPER-VISUAL${NC} ${W}|${NC} ${DG}$(date +"%Y-%m-%d %H:%M:%S")${NC}   ${VIOLET}║${NC}"
     echo -e "${VIOLET}╚══════════════════════════════════════════════════════════════════════════════╝${NC}"
     
-    echo -e "\n${Y}                  ★★★ VIP ACCESS PROTOCOL ACTIVATED ★★★${NC}\n"
+    echo -e "\n${Y}                 ★★★ VIP ACCESS PROTOCOL ACTIVATED ★★★${NC}\n"
 }
 
 render_vip_header
