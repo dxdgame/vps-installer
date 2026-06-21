@@ -10,7 +10,6 @@ WHITE='\033[1;37m'
 NC='\033[0m' # No Color
 
 STORAGE_DIR="/var/lib/deupgaming"
-PID_DIR="/var/run/deupgaming"
 
 # Centralized Branding Header
 show_branding_banner() {
@@ -29,7 +28,6 @@ init_system_check() {
         sudo apt-get update -y && sudo apt-get install -y qemu-system-x86 qemu-utils wget curl screen > /dev/null 2>&1
     fi
     sudo mkdir -p "$STORAGE_DIR"
-    sudo mkdir -p "$PID_DIR"
 }
 
 show_main_menu() {
@@ -61,23 +59,29 @@ deploy_qemu_vm() {
     local os_label=$1
     local image_url=$2
     
-    echo -ne "💾 Enter a custom name for this VM (e.g., myvm1): "
+    echo -ne "💾 Enter a custom unique name for this VM (e.g., myvm1): "
     read -r vm_name
     if [ -z "$vm_name" ]; then vm_name="${os_label}_vm"; fi
 
     local disk_path="${STORAGE_DIR}/${vm_name}.qcow2"
 
-    if [ -f "$disk_path" ]; then
-        echo -e "❌ VM name already exists!"
-        sleep 2 && show_main_menu
+    # Strict running process verification
+    if sudo screen -list | grep -q "deup_${vm_name}"; then
+        echo -e "${RED}❌ Error: A VM named '$vm_name' is already running!${NC}"
+        echo -e "${YELLOW}👉 Please stop it first or choose a different name.${NC}"
+        read -p "Press Enter to return..."
+        show_main_menu
     fi
 
     echo -e "⏳ Setting up $vm_name... Powered by DeupGaming"
-    echo -e "📦 ${BLUE}[INFO]${NC} Downloading template archive..."
-    sudo wget -q --show-progress "$image_url" -O "$disk_path"
-    sudo qemu-img resize "$disk_path" +20G > /dev/null 2>&1
+    
+    if [ ! -f "$disk_path" ]; then
+        echo -e "📦 ${BLUE}[INFO]${NC} Downloading template archive..."
+        sudo wget -q --show-progress "$image_url" -O "$disk_path"
+        sudo qemu-img resize "$disk_path" +20G > /dev/null 2>&1
+    fi
 
-    # Background execution using screen command to prevent terminal freeze
+    # Launching with background detached screen layer
     sudo screen -dmS "deup_${vm_name}" qemu-system-x86_64 \
         -hda "$disk_path" \
         -m 32G \
@@ -86,7 +90,7 @@ deploy_qemu_vm() {
         -device e1000,netdev=net0 \
         -accel tcg
 
-    echo -e "${GREEN}✓ VM $vm_name created and started successfully in background!${NC}"
+    echo -e "${GREEN}✓ VM $vm_name initiated successfully in the background!${NC}"
     sleep 2 && show_main_menu
 }
 
@@ -96,7 +100,7 @@ list_vms() {
     echo -e "📜 ${YELLOW}Active DeupGaming Virtual Machines:${NC}"
     echo -e "------------------------------------------------"
     
-    local files=("$STORAGE_DIR"/*.qcow2)
+    local files=("${STORAGE_DIR}"/*.qcow2)
     if [ ! -e "${files[0]}" ]; then
         echo -e "   No VMs found."
     else
@@ -120,9 +124,9 @@ stop_vm() {
     read -r vm_name
     if sudo screen -list | grep -q "deup_${vm_name}"; then
         sudo screen -S "deup_${vm_name}" -X quit
-        echo -e "${GREEN}✓ VM $vm_name has been stopped.${NC}"
+        echo -e "${GREEN}✓ VM $vm_name has been safely stopped and disk lock released.${NC}"
     else
-        echo -e "${RED}❌ VM is not running or doesn't exist.${RED}"
+        echo -e "${RED}❌ VM is not running or doesn't exist.${NC}"
     fi
     sleep 2 && show_main_menu
 }
@@ -134,7 +138,7 @@ start_vm() {
 
     if [ -f "$disk_path" ]; then
         if sudo screen -list | grep -q "deup_${vm_name}"; then
-            echo -e "${YELLOW}⚠️ VM is already running!${NC}"
+            echo -e "${YELLOW}⚠️ VM is already active and locked!${NC}"
         else
             sudo screen -dmS "deup_${vm_name}" qemu-system-x86_64 \
                 -hda "$disk_path" \
@@ -143,7 +147,7 @@ start_vm() {
                 -netdev user,id=net0,hostfwd=tcp::2222-:22 \
                 -device e1000,netdev=net0 \
                 -accel tcg
-            echo -e "${GREEN}✓ VM $vm_name started successfully in background.${NC}"
+            echo -e "${GREEN}✓ VM $vm_name started successfully in the background.${NC}"
         fi
     else
         echo -e "${RED}❌ Disk image not found!${NC}"
